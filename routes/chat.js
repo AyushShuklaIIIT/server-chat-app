@@ -48,7 +48,7 @@ router.get('/history/:id', auth, async (req, res) => {
     const { type } = req.query;
     const currentUserId = req.user.userId;
 
-    console.log(`🔍 Fetching ${type} history for ID: ${id}`);
+    // console.log(`🔍 Fetching ${type} history for ID: ${id}`);
 
     let messages;
 
@@ -67,7 +67,7 @@ router.get('/history/:id', auth, async (req, res) => {
       .sort({ createdAt: 1 });
     }
 
-    console.log(`Found ${messages.length} messages`);
+    // console.log(`Found ${messages.length} messages`);
     res.json(messages);
   } catch (err) {
     console.error("History Error:", err);

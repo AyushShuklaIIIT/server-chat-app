@@ -1,0 +1,36 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment Variables (CRITICAL: Do not upload .env to GitHub)
+.env
+.env.test
+.env.production
+.env.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor config (Optional)
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Build output (if you decide to use TypeScript later)
+dist/
+build/

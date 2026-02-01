@@ -75,4 +75,30 @@ router.get('/history/:id', auth, async (req, res) => {
   }
 });
 
+router.delete('/rooms/:roomId', auth, async (req, res) => {
+  try {
+    await Message.deleteMany({ room_id: req.params.roomId });
+    await Room.findByIdAndDelete(req.params.roomId);
+    res.json({ message: 'Room deleted' });
+  } catch {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+router.delete('/messages/:messageId', auth, async (req, res) => {
+  try {
+    const msg = await Message.findById(req.params.messageId);
+    if (!msg) return res.status(404).json({ message: 'Message not found' });
+
+    if (msg.sender_id.toString() !== req.user.userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    await Message.findByIdAndDelete(req.params.messageId);
+    res.json({ message: 'Message deleted' });
+  } catch {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 export default router;

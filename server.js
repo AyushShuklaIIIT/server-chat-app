@@ -103,6 +103,19 @@ io.on('connection', async (socket) => {
         await User.findByIdAndUpdate(socket.userId, { status: 'offline' });
         io.emit('user_status', { userId: socket.userId, status: 'offline'});
     });
+
+    socket.on('mark_as_read', async ({ roomId, userId }) => {
+      try {
+        await Message.updateMany(
+          { room_id: roomId, receiver_id: userId, is_read: false },
+          { $set: { is_read: true } }
+        );
+
+        io.to(roomId).emit('messages_read_update', { roomId });
+      } catch(err) {
+        console.error('Read receipt error:', err);
+      }
+    });
 });
 
 app.get('/', (req, res) => {

@@ -40,8 +40,6 @@ const io = new Server(server, {
 io.use(async (socket, next) => {
     try {
     const token = socket.handshake.auth.token;
-    // console.log(`🔍 Socket Attempting Connection... Token: ${token ? 'Present' : 'Missing'}`);
-    
     if (!token) return next(new Error('Authentication error: No Token'));
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -54,46 +52,34 @@ io.use(async (socket, next) => {
 });
 
 io.on('connection', async (socket) => {
-    // console.log(`Socket connected: ${socket.id}`);
-    // console.log(`User connected: ${socket.userId}`);
-
     await User.findByIdAndUpdate(socket.userId, { status: 'online' });
     io.emit('user_status', { userId: socket.userId, status: 'online'});
 
     socket.join(socket.userId);
-    // console.log(`User ${socket.userId} joined room: ${socket.userId}`);
 
     socket.on('join_room', (roomId) => {
         socket.join(roomId);
-        // console.log(`User ${socket.userId} joined room ${roomId}`);
     });
 
     socket.on('send_message', async (data) => {
-    // console.log("1️⃣ SERVER RECEIVED DATA:", data);
-
     try {
-      const { content, type, room_id, sender_id } = data;
+      const { content, type, room_id, messageType } = data;
 
       if (!content || !type || !room_id) {
-        console.error("❌ MISSING FIELDS. Content:", content, "Type:", type, "Room/Receiver:", room_id);
+        console.error("❌ MISSING FIELDS:", data);
         return;
       }
-
-      // console.log("2️⃣ PREPARING TO SAVE...");
 
       const newMessage = new Message({
         sender_id: socket.userId,
         content: content,
         type: type,
+        messageType: messageType || 'text',
         room_id: type === 'room' ? room_id : null,
         receiver_id: type === 'private' ? room_id : null 
       });
 
-      // console.log("3️⃣ MODEL INSTANCE CREATED:", newMessage);
-
       const savedMessage = await newMessage.save();
-      
-      // console.log("✅ SUCCESS! SAVED TO DB:", savedMessage._id);
       const populatedMessage = await savedMessage.populate('sender_id', 'username avatar');
 
       if (type === 'room') {
@@ -114,7 +100,6 @@ io.on('connection', async (socket) => {
     });
     
     socket.on('disconnect', async () => {
-        // console.log(`User disconnected: ${socket.userId}`);
         await User.findByIdAndUpdate(socket.userId, { status: 'offline' });
         io.emit('user_status', { userId: socket.userId, status: 'offline'});
     });

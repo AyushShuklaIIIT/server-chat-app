@@ -18,7 +18,19 @@ const messageSchema = new mongoose.Schema(
       default: null,
     },
     content: { type: String, required: true },
-    type: { type: String, enum: ["private", "room"], required: true },
+    
+    type: { 
+      type: String, 
+      enum: ["private", "room"], 
+      required: true 
+    },
+
+    messageType: { 
+      type: String, 
+      enum: ["text", "image"], 
+      default: "text" 
+    },
+
     is_read: { type: Boolean, default: false },
   },
   { timestamps: true },
